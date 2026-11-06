@@ -66,3 +66,7 @@ a.area:hover{background:var(--line)}
 .line .ts{color:var(--blue);font-size:12px;min-width:36px;padding-top:2px}
 .line b{display:block;font-weight:500}
 .line i{display:block;font-style:normal;color:var(--muted);font-size:13px}
+.vd{position:absolute;left:8px;top:8px;font-size:12px;font-weight:600;padding:2px 7px;border-radius:4px;color:#fff}
+.vd.keep{background:#2ba640}.vd.drop{background:#e5484d}
+.card.dropped{opacity:.45}
+.pill.keep.active{background:#2ba640;color:#fff}.pill.drop.active{background:#e5484d;color:#fff}

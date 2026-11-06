@@ -15,6 +15,7 @@ let history = read('history', []);      // [id]
 let later = read('later', []);          // [id]
 let results = read('results', {});      // id -> {score,total,at}
 let prefs = read('prefs', { theme: 'dark' });
+let verdict = read('verdict', {});     // id -> 'keep' | 'drop'（你筛选的结果）
 
 // ---------- 图标 ----------
 const P = {
@@ -57,15 +58,15 @@ function route() {
 }
 
 function card(v) {
-  const r = results[v.id];
-  const badge = r ? `<span class="done">${r.score}/${r.total}</span>` : '';
+  const r = results[v.id], vd = verdict[v.id];
+  const badge = (vd ? `<span class="vd ${vd}">${vd === 'keep' ? '✓ 保留' : '✗ 不要'}</span>` : '') + (r ? `<span class="done">${r.score}/${r.total}</span>` : '');
   const saved = later.includes(v.id);
-  return `<a class="card" href="#/watch/${v.id}">
+  return `<a class="card ${vd === 'drop' ? 'dropped' : ''}" href="#/watch/${v.id}">
     <div class="thumb"><img src="https://i.ytimg.com/vi/${v.id}/mqdefault.jpg" alt="" loading="lazy">
       <button class="save ${saved ? 'active' : ''}" data-save="${v.id}" aria-label="稍后看">${icon(saved ? 'check' : 'later')}</button>
       ${badge}<span class="duration">${mmss(v.seconds)}</span></div>
     <div class="info"><h3>${esc(v.title)}</h3>
-      <div class="sub">${esc(v.scene)} · ${LEVEL[v.level] || ''}</div></div></a>`;
+      <div class="sub">${esc(v.channel)} · ${esc(v.scene)}</div></div></a>`;
 }
 
 const grid = list => list.length ? `<div class="grid">${list.map(card).join('')}</div>` : '<div class="status">这里还没有视频</div>';
@@ -83,13 +84,15 @@ function render() {
 
   if (path === '/') {
     const sc = u.searchParams.get('scene') || '';
-    const lv = u.searchParams.get('level') || '';
-    let list = videos.filter(v => (!sc || v.scene === sc) && (!lv || String(v.level) === lv));
+    const st = u.searchParams.get('st') ?? 'todo';
+    const stOk = v => st === 'all' || (st === 'todo' ? !verdict[v.id] : verdict[v.id] === st);
+    let list = videos.filter(v => (!sc || v.scene === sc) && stOk(v));
     if (q) list = list.filter(v => (v.title + v.scene + v.channel).toLowerCase().includes(q));
-    const chip = (k, val, label, cur) => `<a class="pill ${cur === val ? 'active' : ''}" href="#/?${new URLSearchParams({ ...(sc && k !== 'scene' ? { scene: sc } : {}), ...(lv && k !== 'level' ? { level: lv } : {}), ...(val ? { [k]: val } : {}) })}">${label}</a>`;
+    const chip = (k, val, label, cur) => `<a class="pill ${cur === val ? 'active' : ''}" href="#/?${new URLSearchParams({ ...(sc && k !== 'scene' ? { scene: sc } : {}), ...(k !== 'st' ? { st } : {}), ...(val ? { [k]: val } : {}) })}">${label}</a>`;
+    const n = k => videos.filter(v => k === 'todo' ? !verdict[v.id] : verdict[v.id] === k).length;
     html = `<div class="toolbar">${chip('scene', '', '全部', sc)}${scenes.map(s => chip('scene', s, esc(s), sc)).join('')}</div>
-      <div class="toolbar">${chip('level', '', '全部难度', lv)}${[1, 2, 3].map(l => chip('level', String(l), LEVEL[l], lv)).join('')}
-      <span class="grow"></span><span class="sub">${list.length} 个视频 · 已做 ${Object.keys(results).length}</span></div>
+      <div class="toolbar">${chip('st', 'todo', `未筛 ${n('todo')}`, st)}${chip('st', 'keep', `保留 ${n('keep')}`, st)}${chip('st', 'drop', `不要 ${n('drop')}`, st)}${chip('st', 'all', `全部 ${videos.length}`, st)}
+      <span class="grow"></span><button class="pill" id="export">导出筛选结果</button></div>
       ${q ? `<h2>搜索 “${esc(q)}”</h2>` : ''}${grid(list)}`;
   } else if (path === '/scenes') {
     html = `<h2>场景</h2><div class="areas">${scenes.map(s => {
@@ -111,16 +114,19 @@ function render() {
         <div class="player"><div id="yt"></div></div>
         <h1>${esc(v.title)}</h1>
         <div class="owner"><span class="sub">${esc(v.scene)} · ${LEVEL[v.level] || ''} · ${mmss(v.seconds)} · ${esc(v.channel)}</span>
-          <div class="actions"><button class="pill" id="replay">${icon('replay')}从头再看</button>
+          <div class="actions"><button class="pill keep ${verdict[v.id] === 'keep' ? 'active' : ''}" data-verdict="keep">✓ 保留</button>
+          <button class="pill drop ${verdict[v.id] === 'drop' ? 'active' : ''}" data-verdict="drop">✗ 不要</button>
+          <button class="pill" id="replay">${icon('replay')}从头再看</button>
           <button class="pill" data-watchsave="${v.id}">${icon('later')}${later.includes(v.id) ? '已加入' : '稍后看'}</button></div></div>
-        <div id="quiz" class="quiz"><div class="waiting"><b>先别看字幕，完整看完这一段</b>
+        ${v.questions?.length ? `<div id="quiz" class="quiz"><div class="waiting"><b>先别看字幕，完整看完这一段</b>
           <p>看完会自动出题。画面里发生了什么、他们大概在说什么，先在心里猜一猜。</p>
-          <button class="pill" id="start-quiz">我看完了，开始答题</button></div></div>
+          <button class="pill" id="start-quiz">我看完了，开始答题</button></div></div>` : `<p class="notice">点「保留」或「不要」后自动跳到下一个没筛过的视频。</p>`}
       </section><aside class="related">${videos.filter(x => x.id !== v.id && x.scene === v.scene).concat(videos.filter(x => x.scene !== v.scene)).slice(0, 10).map(card).join('')}</aside></div>`;
       $('#view').innerHTML = html;
       bind();
       mountPlayer(v, start);
-      $('#start-quiz').onclick = () => showQuiz(v);
+      if ($('#start-quiz')) $('#start-quiz').onclick = () => showQuiz(v);
+      document.querySelectorAll('[data-verdict]').forEach(b => b.onclick = () => judge(v, b.dataset.verdict));
       $('#replay').onclick = () => { player?.seekTo?.(0, true); player?.playVideo?.(); };
       window.scrollTo(0, 0);
       return;
@@ -156,9 +162,9 @@ function mountPlayer(v, start) {
         onReady: e => { try { e.target.unloadModule('captions'); e.target.unloadModule('cc'); } catch {} },
         onStateChange: e => {
           if (e.data === 1) { try { e.target.unloadModule('captions'); } catch {} }   // 播放时再关一次字幕
-          if (e.data === 0 && !$('#quiz .q')) showQuiz(v);                          // 播完自动出题
+          if (e.data === 0 && v.questions?.length && !$('#quiz .q')) showQuiz(v);                          // 播完自动出题
         },
-        onError: e => toast(`这个视频暂时放不了（错误 ${e.data}），可以先跳过`),
+        onError: e => toast(`这个视频放不了（错误 ${e.data}），建议点「不要」`),
       },
     });
   });
@@ -204,6 +210,24 @@ function grade(v) {
   $('#quiz').scrollIntoView({ behavior: 'smooth' });
 }
 
+// ---------- 筛选 ----------
+function judge(v, k) {
+  if (verdict[v.id] === k) delete verdict[v.id]; else verdict[v.id] = k;   // 再点一次 = 撤销
+  write('verdict', verdict);
+  if (!verdict[v.id]) { render(); return; }
+  toast(k === 'keep' ? '已保留' : '已标记不要');
+  const i = videos.indexOf(v);
+  const next = videos.slice(i + 1).concat(videos.slice(0, i)).find(x => !verdict[x.id]);
+  location.hash = next ? '#/watch/' + next.id : '#/?st=keep';
+}
+
+function exportVerdict() {
+  const keep = videos.filter(v => verdict[v.id] === 'keep').map(v => v.id);
+  const drop = videos.filter(v => verdict[v.id] === 'drop').map(v => v.id);
+  const t = `GuessTube 筛选结果（共 ${videos.length}，保留 ${keep.length}，不要 ${drop.length}，未筛 ${videos.length - keep.length - drop.length}）\n保留：${keep.join(' ')}\n不要：${drop.join(' ')}`;
+  navigator.clipboard.writeText(t).then(() => toast('已复制，粘贴发给 Claude 就行'), () => prompt('复制下面的内容', t));
+}
+
 // ---------- 事件 ----------
 function bind() {
   document.querySelectorAll('[data-save]').forEach(b => b.onclick = e => {
@@ -218,6 +242,7 @@ function bind() {
     write('later', later); b.innerHTML = icon('later') + (later.includes(id) ? '已加入' : '稍后看');
   });
   document.querySelectorAll('[data-seek]').forEach(b => b.onclick = () => seek(+b.dataset.seek));
+  if ($('#export')) $('#export').onclick = exportVerdict;
   const ch = $('#clear-history');
   if (ch) ch.onclick = () => { history = []; write('history', history); render(); };
 }

@@ -15,15 +15,17 @@ OFFICIAL = re.compile(r"^(Movieclips|The Office|TBS|Parks and Recreation|Brookly
                       r"Universal Pictures|BBC|HBO Max|Disney Jr\.|Comedy Central.*|Sony Pictures.*|Warner Bros.*|"
                       r"Illumination|Paramount.*|Lionsgate.*|ABC|NBC|FOX|Apple TV|Hulu|20th Century Studios|"
                       r"Entertainment Access|Binge Society|The Simpsons|Animation Domination|Adult Swim|Cartoon Network|"
-                      r"Nickelodeon|Sesame Street|Bluey.*|Peppa Pig.*|Timeless Moments)$")
+                      r"Nickelodeon|Sesame Street|Bluey.*|Timeless Moments|The Big Bang Theory|Young Sheldon|UP Pixar|Schitt's Creek|"
+                      r"Key & Peele|Comedy Central UK|Universal Kids|Disney Club UK|Paramount Plus|Apple TV)$")
+SONG = re.compile(r"song|sing|music video|lyric|full episode|compilation|best of|moments|supercut|trailer|#shorts", re.I)
 
 d = [r for r in json.loads((W / "candidates.json").read_text()) if not r["reject"]]
-pool = [r for r in d if OFFICIAL.match(r["channel"].strip()) and r["views"] >= 100_000]
+pool = [r for r in d if OFFICIAL.match(r["channel"].strip()) and r["views"] >= 100_000 and not SONG.search(r["title"])]
 pool.sort(key=lambda r: -r["views"])
 per = Counter()
 short = []
 for r in pool:
-    if per[r["channel"]] >= 14:
+    if per[r["channel"]] >= 30:
         continue
     per[r["channel"]] += 1
     short.append(r)
