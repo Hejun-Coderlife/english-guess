@@ -1,1 +1,29 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23ff6600%27/%3E%3Cpath d=%27M12 8L24 16L12 24Z%27 fill=%27white%27/%3E%3C/svg%3E"><title>HackerTube</title><link rel="stylesheet" href="style.css"></head><body><header><div class="left"><button id="menu" class="icon" aria-label="Menu"></button><a class="brand" href="#/">Hacker<b>Tube</b></a></div><form id="search" role="search"><input id="query" type="search" placeholder="Search" aria-label="Search videos" autocomplete="off"><button aria-label="Search" id="search-button"></button></form><div class="right"><a href="#/about" class="icon" id="about" aria-label="About HackerTube"></a><button class="icon" id="theme" aria-label="Toggle dark theme"></button></div></header><div id="scrim"></div><nav aria-label="Main navigation"></nav><main id="view"></main><dialog id="help"><h3>Keyboard shortcuts</h3><p><kbd>/</kbd> Search</p><p><kbd>Esc</kbd> Close menu</p><p><kbd>?</kbd> Keyboard shortcuts</p><button class="pill" id="close-help">Close</button></dialog><div id="toast" role="status"></div><script src="data/videos.js"></script><script src="main.js"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23ff6600%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2720%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27Arial%27 font-weight=%27bold%27%3E%3F%3C/text%3E%3C/svg%3E">
+<title>GuessTube · 看画面猜英文</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="left">
+    <button id="menu" class="icon" aria-label="菜单"></button>
+    <a class="brand" href="#/">Guess<b>Tube</b></a>
+  </div>
+  <form id="search" role="search">
+    <input id="query" type="search" placeholder="搜索标题、剧名、场景" autocomplete="off">
+    <button aria-label="搜索" id="search-button"></button>
+  </form>
+  <div class="right"><button class="icon" id="theme" aria-label="切换深色"></button></div>
+</header>
+<div id="scrim"></div>
+<nav aria-label="主导航"></nav>
+<main id="view"></main>
+<div id="toast" role="status"></div>
+<script src="data/videos.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

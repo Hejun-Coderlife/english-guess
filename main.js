@@ -1,38 +1,233 @@
-(()=>{'use strict';
-const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const read=(k,d)=>{try{return JSON.parse(localStorage.getItem('vs-'+k))??d}catch{return d}},write=(k,v)=>{try{localStorage.setItem('vs-'+k,JSON.stringify(v))}catch{toast('Browser storage unavailable. Changes last for this session.')}};
-const paths={menu:'M4 6h16M4 12h16M4 18h16',home:'M3 11 12 3l9 8v10h-6v-7H9v7H3z',longs:'M3 6h18v12H3zM10 9l5 3-5 3z',liked:'M8 21H3V10h5m0 11h11l2-11h-7l1-6-3-2-4 8z',history:'M3 11a9 9 0 1 1 2 7M3 5v6h6M12 7v6l4 2',later:'M12 8v5l4 2M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',categories:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z',playlists:'M4 5h11M4 9h11M4 13h8M16 12l5 4-5 4z',settings:'M9 3h6l1 4 4 1 1 6-4 2-1 4h-6l-2-4-4-1-1-6 4-2zM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0',search:'M21 21l-6-6M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0',about:'M10 8a2 2 0 1 1 3 2c-1 1-1 1-1 3M12 17h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',theme:'M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12',filter:'M4 6h4m4 0h8M8 3v6M4 12h10m4 0h2M14 9v6M4 18h3m4 0h9M7 15v6',check:'M4 12l5 5L20 6'};
-Object.assign(paths,{"home": "M4 21V10.08l8-6.96 8 6.96V21h-6v-6h-4v6H4z", "longs": "M3 6h18v12H3zm2 2v8h14V8zm4 1.5v5l4.5-2.5z", "liked": "M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H3v10h4h1h9.43c1.06 0 1.98-.67 2.19-1.61l1.34-6c.27-1.24-.78-2.39-2.19-2.39zM7 20H4v-8h3v8z", "history": "M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z", "later": "M14.97 16.95 10 13.87V7h2v5.76l4.03 2.49-1.06 1.7zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z", "categories": "M4 4h7v7H4zm2 2v3h3V6zm7-2h7v7h-7zm2 2v3h3V6zM4 13h7v7H4zm2 2v3h3v-3zm7-2h7v7h-7zm2 2v3h3v-3z", "playlists": "M3 6h12v2H3zm0 4h12v2H3zm0 4h8v2H3zm12 0v6l5-3z", "settings": "M19.14 12.94c.04-.31.06-.62.06-.94s-.02-.63-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z", "menu": "M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z", "theme": "M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z", "about": "M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z", "search": "M20.87 20.17l-5.59-5.59A6.95 6.95 0 0 0 17 10a7 7 0 1 0-7 7c1.75 0 3.35-.64 4.58-1.71l5.59 5.59.7-.71zM10 16a6 6 0 1 1 0-12 6 6 0 0 1 0 12z"});
-const icon=n=>`<svg style="${['filter','check'].includes(n)?'':'fill:currentColor;stroke:none'}" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n]||paths.longs}"/></svg>`;
-for(const n of ['menu','about','theme'])$('#'+n).innerHTML=icon(n);$('#search-button').innerHTML=icon('search');
-const videos=VIDEO_DATA.videos,byId=Object.fromEntries(videos.map(v=>[v.id,v]));let likes=read('likes',[]),seen=read('seen',[]),later=read('later',[]),playlists=read('playlists',[]),filtersOpen=false,limit=72,prefs=read('prefs',{frames:true,theme:'light'});document.documentElement.dataset.theme=prefs.theme;
-const nav=[['Home','/','home'],['Longs','/browse?dur=xlong','longs'],['Liked','/liked','liked'],['History','/history','history'],['Watch later','/later','later'],['Categories','/categories','categories'],['Playlists','/playlists','playlists'],['Settings','/settings','settings']];
-function current(){return new URL(location.hash.startsWith('#/')?location.hash.slice(1):location.protocol==='file:'?'/':location.pathname.replace(/\/index.html$/,'/')+location.search,'https://local.invalid')}
-const go=p=>{location.hash=p};function toast(s){$('#toast').textContent=s;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),2500)}
-function toggle(k,id){let list=k==='likes'?likes:later;list=list.includes(id)?list.filter(x=>x!==id):[...list,id];if(k==='likes')likes=list;else later=list;write(k,list)}
-function viewCount(v){const m=v.meta.match(/([\d.]+)([KMB]?) views/);return m?+m[1]*({K:1000,M:1e6,B:1e9}[m[2]]||1):0}function year(v){let m=v.meta.match(/(\d+) years?/);return m?2026-Number(m[1]):0}
-function card(v,index=0){return `<a class="card" href="#/watch/${v.id}"><div class="thumb" aria-label="Video preview placeholder"><img src="https://i.ytimg.com/vi/${v.id}/hq2.jpg" alt="" loading="${index<36?'eager':'lazy'}"><button class="save ${later.includes(v.id)?'active':''}" data-save="${v.id}" aria-label="${later.includes(v.id)?'Remove from Watch later':'Watch later'}">${icon(later.includes(v.id)?'check':'later')}</button><span class="duration">${esc(v.duration)}</span></div><div class="info"><h3>${esc(v.title)}</h3><div class="sub">${esc(v.channel)}</div><div class="sub">${esc(v.meta)}</div></div></a>`}
-function grid(v){return v.length?`<div class="grid">${v.slice(0,limit).map(card).join('')}</div>${v.length>limit?'<button class="pill load" id="load">Show more</button>':''}`:'<div class="status">No videos match these filters.</div>'}
-const groups=[['Upload date','date',[['year','Past year'],['2020s','2020s'],['2010s','2010s'],['2000s','2000s']]],['Type','type',['Talk','Lecture','Explainer','Tutorial','Documentary','Interview','Demo','Commentary','Comedy','Music'].map(t=>[t.toLowerCase(),t])],['Duration','dur',[['short','Under 4 minutes'],['medium','4–20 minutes'],['long','20–60 minutes'],['xlong','Over 1 hour']]],['Features','feature',[['gems','Hidden gems'],['evergreen','Evergreen only']]],['Sort by','sort',[['','Best first'],['recent','Recently recommended'],['date','Upload date'],['old','Oldest first'],['views','View count'],['liked','Like ratio']]]];
-function filterbar(u,play){let chips=groups.flatMap(([,k,opts])=>opts.filter(([v])=>v&&u.searchParams.get(k)===v).map(([v,t])=>`<button class="pill active" data-filter="${k}" data-value="${v}">${t} ×</button>`)).join('');return `<div class="toolbar"><button class="pill ${filtersOpen?'active':''}" id="filters-toggle" aria-expanded="${filtersOpen}">${icon('filter')}Filters</button>${chips}${play?'<span class="grow"></span><a class="pill" id="playall" target="_blank" rel="noopener">▷ Play all on YouTube</a>':''}</div>${filtersOpen?'<section class="filters" aria-label="Video filters">'+groups.map(([t,k,opts])=>`<div><h4>${t}</h4>${opts.map(([v,label])=>`<button data-filter="${k}" data-value="${v}" class="${(u.searchParams.get(k)||'')===v?'active':''}">${label}</button>`).join('')}</div>`).join('')+'</section>':''}`}
-function filtered(v,u){let a=v.slice(),p=u.searchParams,d=p.get('dur');if(d)a=a.filter(x=>d==='short'?x.duration_s<240:d==='medium'?x.duration_s>=240&&x.duration_s<1200:d==='long'?x.duration_s>=1200&&x.duration_s<3600:x.duration_s>=3600);if(p.has('date'))a=a.filter(x=>{let y=year(x),d=p.get('date');return d==='year'?y>=2025:d==='2020s'?y>=2020:d==='2010s'?y>=2010&&y<2020:y>=2000&&y<2010});if(p.get('feature')==='gems')a=a.filter(v=>viewCount(v)<100000);if(p.has('type'))a=a.filter(v=>v.type===p.get('type'));if(p.get('feature')==='evergreen')a=a.filter(v=>v.evergreen===true);if(p.get('sort')==='views')a.sort((a,b)=>viewCount(b)-viewCount(a));if(p.get('sort')==='date')a.sort((a,b)=>year(b)-year(a));if(p.get('sort')==='old')a.sort((a,b)=>year(a)-year(b));return a}
-function saved(title,ids,empty,h=false){return `<h2>${title}</h2>${h&&ids.length?'<div class="toolbar"><button class="pill" id="clear-history">Clear all watch history</button></div>':''}${ids.length?grid(ids.slice().reverse().map(id=>byId[id]).filter(Boolean)):`<div class="status">${empty}</div>`}`}
-function render(){let u=current(),p=u.pathname.replace(/\/$/,'')||'/',v=[],html='';document.title=(p==='/'?'HackerTube':p.split('/')[1]+' - HackerTube');document.body.classList.remove('drawer');$('nav').innerHTML=nav.map(([label,url,n])=>`<a href="#${url}" class="${p+u.search===url?'active':''}">${icon(n)}<span>${label}</span></a>`).join('');
-if(p==='/'||p==='/browse'||p.startsWith('/search/')){let search=p.startsWith('/search/'),q=search?decodeURIComponent(p.slice(8)):'';v=(VIDEO_DATA.orders[p==='/'?'home':'browse']||[]).map(id=>byId[id]);if(search)v=videos.filter(v=>(v.title+' '+v.channel).toLowerCase().includes(q.toLowerCase()));v=filtered(v,u);html=(p==='/browse'?'<h2>All videos</h2>':search?`<h2>Search results for “${esc(q)}”</h2>`:'')+filterbar(u,p!=='/')+((u.searchParams.has('type')||u.searchParams.get('feature')==='evergreen'||['liked','recent'].includes(u.searchParams.get('sort')))?'<p class="notice">Original metadata for this filter was not captured; these results cannot be verified.</p>':'')+grid(v)}
-else if(p==='/liked')html=saved('Liked videos',likes,'Videos you like will show up here, and shape your Home feed.');
-else if(p==='/history')html=saved('History',seen,'Videos you open will show up here.',true);
-else if(p==='/later')html=saved('Watch later',later,"Save videos to watch later with the clock button on a thumbnail or on a video's page.");
-else if(p==='/settings')html=`<div class="settings"><h2>Settings</h2><label class="setting"><div><b>Show video frames instead of thumbnails</b><p>Use a frame from the video instead of an uploader thumbnail. This edition uses neutral preview placeholders until authorized images are supplied.</p></div><input id="frames" type="checkbox" ${prefs.frames?'checked':''}></label><label class="setting"><div><b>Appearance</b><p>Choose a light or dark background.</p></div><select id="appearance"><option value="light" ${prefs.theme==='light'?'selected':''}>Light</option><option value="dark" ${prefs.theme==='dark'?'selected':''}>Dark</option></select></label><div class="setting"><div><b>Your local library</b><p>${videos.length} videos. Likes, history and playlists stay in this browser.</p><a class="pill" href="data/videos.json" download>Export video index</a></div></div></div>`;
-else if(p==='/categories')html=`<h2>Categories</h2><p class="notice">Original categories were not captured. Explore the local index by duration.</p><div class="toolbar"><a class="pill" href="#/browse">All videos</a></div><div class="areas">${groups[2][2].map(([id,t])=>`<a class="area" href="#/browse?dur=${id}"><h3>${t}</h3><span class="sub">${filtered(videos,new URL('https://local.invalid/?dur='+id)).length} videos</span></a>`).join('')}</div>`;
-else if(p==='/playlists')html=`<h2>Playlists</h2><p class="notice">Create personal playlists. Original curated playlists were not captured.</p><form id="new-playlist" class="playlist-head"><input name="title" aria-label="Playlist name" placeholder="Playlist name" required maxlength="100"><button class="pill">Create playlist</button></form><div class="areas">${playlists.map(pl=>`<div class="area"><button class="remove" data-delete="${pl.id}" aria-label="Delete playlist">×</button><a href="#/p/${pl.id}"><h3>${esc(pl.title)}</h3><span>${pl.ids.length} videos</span></a></div>`).join('')}</div>`;
-else if(p.startsWith('/p/')){let pl=playlists.find(x=>x.id===p.slice(3));html=pl?`<h2>${esc(pl.title)}</h2><p class="notice">Add videos using “Add to playlist” on a video's page.</p>${pl.ids.length?grid(pl.ids.map(id=>byId[id]).filter(Boolean)):'<div class="status">Nothing here yet.</div>'}`:'<div class="status">Playlist not found.</div>'}
-else if(p.startsWith('/watch/')){let d=byId[p.slice(7)];if(!d)html='<div class="status">Video not found in this local index.</div>';else{seen=seen.filter(id=>id!==d.id).concat(d.id).slice(-200);write('seen',seen);html=`<div class="watch"><section class="primary"><div class="player"><iframe src="https://www.youtube.com/embed/${d.id}" title="${esc(d.title)}" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><h1>${esc(d.title)}</h1><div class="owner"><b>${esc(d.channel)}</b><div class="actions"><button class="pill ${likes.includes(d.id)?'active':''}" data-like="${d.id}">${icon('liked')}${likes.includes(d.id)?'Liked':'Like'}</button><button class="pill" data-watchsave="${d.id}">${icon('later')}${later.includes(d.id)?'Saved':'Watch later'}</button><button class="pill" data-addpl="${d.id}">＋ Add to playlist</button></div></div><div class="desc"><b>${esc(d.meta)}</b><p>${esc(d.duration)} · <a href="${d.url}" target="_blank" rel="noopener">Watch on YouTube ↗</a></p><p>Playback requires internet. If your browser blocks the local embed, open YouTube directly.</p><p>Category: ${d.categories.length?d.categories.map(esc).join(', '):'Not available in capture'}</p></div><h2>Hacker News discussions</h2>${d.hn_posts.length?d.hn_posts.map(h=>`<p><a href="${esc(h.url)}">${esc(h.title)}</a></p>`).join(''):'<p class="notice">Original Hacker News post links were not captured. No source link has been inferred.</p>'}</section><aside class="related">${videos.filter(x=>x.id!==d.id).slice(0,10).map(card).join('')}</aside></div>`}}
-else if(p==='/about'||p==='/data')html="<article class=\"about\">\n    <h1>Hacker<span style=\"color:var(--accent)\">Tube</span></h1>\n    <p class=\"lede\">The YouTube videos that Hacker News keeps telling each other to watch.</p>\n\n    <div class=\"stats\">\n      <div class=\"stat\"><b>6,454</b><span>videos</span></div>\n      <div class=\"stat\"><b>39,834</b><span>HN comments read</span></div>\n      <div class=\"stat\"><b>150</b><span>topics in 16 areas</span></div>\n      <div class=\"stat\"><b>2007–2026</b><span>years of HN</span></div>\n    </div>\n\n    <h2>Why</h2>\n    <p>YouTube's recommendations are tuned for watch time. They're very good at finding the next thing you'll\n      click, and not so good at finding the talk you'll still be thinking about next year.</p>\n    <p>Meanwhile, for nearly two decades, Hacker News commenters have been pointing each other at exactly those\n      videos: the conference talk that changed how someone writes software, the lecture series that finally made\n      a subject click, the documentary nobody else seems to know about. Those recommendations are scattered\n      across millions of comments. HackerTube collects them in one place and makes them browsable,\n      searchable and personal.</p>\n\n    <h2>How it was built</h2>\n    <ol class=\"steps\">\n      <li><b>Read all of Hacker News.</b> Every comment from 2007 to 2026 (from a public\n        dataset of the full HN archive) was scanned for YouTube links. That turns up well over a hundred thousand\n        different videos.</li>\n      <li><b>Keep the videos HN keeps coming back to.</b> A video makes the cut if at least three different people\n        linked it with some real commentary, in at least three different months. One-off links and pure drive-bys\n        fall away, leaving roughly 7,000 videos.</li>\n      <li><b>Read each comment with an AI model.</b> A link isn't always a recommendation. Claude read each\n        comment, along with the title of the HN story it was posted under, and judged what the commenter was doing: recommending the video,\n        citing it as a source, using it as a joke, or criticizing it. It also picked out a short quote and a few\n        topics.</li>\n      <li><b>Write a card for every video.</b> Using the video's YouTube details and everything HN said about it,\n        Claude wrote a short summary, why HN people like it, what kind of video it is, and whether it has aged\n        well. Videos are then sorted into a shared list of topics.</li>\n      <li><b>Rank by lasting recommendations.</b> A video's standing comes from how many separate months people\n        recommended it in. Being linked again and again over the years counts for more than one viral spike.</li>\n    </ol>\n\n    <h2>What you can do</h2>\n    <ul>\n      <li><b>Home</b> mixes several kinds of picks: HN classics, hidden gems that HN loves but few people have watched,\n        recent favorites, topics you haven't explored yet, and, once you like a few videos, things similar to them\n        and things that the same HN people also recommended. Hover a video to see why it's there.</li>\n      <li><b>Search</b> understands topics, not just keywords. Searching \"distributed systems\" finds talks that\n        never use those words.</li>\n      <li><b>Browse</b> by topic on the Categories page, or start with one of the Playlists.</li>\n      <li><b>Every video page</b> shows what Hacker News actually said about it: the real comments, with links back\n        to the threads.</li>\n      <li><b>Like</b>, <b>Watch later</b> and <b>History</b> work like you'd expect. Likes steer your Home feed.</li>\n      <li><b>Keyboard shortcuts:</b> press <kbd>?</kbd> to see them all, e.g. <kbd>/</kbd> to search and\n        <kbd>j</kbd>/<kbd>k</kbd> to move through videos.</li>\n    </ul>\n\n    <h2>Fork it</h2>\n    <p>Everything behind this site is yours to reuse. The easiest way: <b>give the zip to your AI agent</b> (Claude\n      Code or similar) and tell it what you want, such as a different interface, a weekly email of talks on your topics,\n      a terminal browser, or an analysis. The zip includes a <code>DATA.md</code> written for agents: how the files fit\n      together, the gotchas, example records, and how to walk you through getting YouTube metadata if you want it.</p>\n    <p>The download (17.8 MB zip) contains:</p>\n    <table class=\"files\"><tr>\n      <td><code>videos.jsonl</code></td><td>All 6,454 videos: YouTube id and link, title, channel, summary, why HN likes it, type, level, shelf life, topics, categories, pull quote, HN stats and quality score</td><td class=\"num\">8.6 MB</td></tr><tr>\n      <td><code>mentions.jsonl</code></td><td>All 39,834 labeled HN comments: comment id and link, author, month, story title, stance, why, quote and the cleaned comment text</td><td class=\"num\">34.7 MB</td></tr><tr>\n      <td><code>taxonomy.json</code></td><td>The 16 areas and 150 topic categories, with synonym-rich descriptions</td><td class=\"num\">44 KB</td></tr><tr>\n      <td><code>related.jsonl</code></td><td>\"HN people also recommend\" for 3,778 videos (counts only, no usernames)</td><td class=\"num\">1.5 MB</td></tr><tr>\n      <td><code>embeddings.npy</code></td><td>The search vectors (bge-small, 384 dimensions, plus embedding_ids.json), so you get semantic search and \"similar videos\" for free</td><td class=\"num\">5.0 MB</td></tr><tr>\n      <td><code>DATA.md</code></td><td>How it was made, every field explained, stance definitions, a code example, licensing</td><td class=\"num\">14 KB</td></tr>\n    </table>\n    <p style=\"margin-top:12px\">It's released under ODC-By 1.0, like the Hacker News archive it comes from: use it for\n      anything, just credit HackerTube. YouTube's own metadata (descriptions, view counts, durations) isn't included,\n      because YouTube's terms don't allow redistributing it. Every record has the video id, so you can fetch it yourself.\n      <a href=\"https://hackertube.org/data\">Download the data →</a></p>\n\n    <h2>Privacy</h2>\n    <p>There are no accounts. Your likes, history and Watch later list are stored only in this browser. Videos play\n      through YouTube's privacy-enhanced embed.</p>\n\n    <h2>Credits</h2>\n    <p>HackerTube was built by <b>Claude Opus 5.5</b>, Anthropic's AI model, working in Claude Code: the data\n      pipeline, the search and recommendations, and this site. It was prompted into existence by\n      <a href=\"https://x.com/karpathy\" target=\"_blank\" rel=\"noopener\">@karpathy</a>. The comment labels, video cards\n      and topic list were written by teams of Claude Sonnet 5.5 agents that Claude Opus coordinated.</p>\n\n    <p class=\"fine\">HackerTube is an independent project. It is not affiliated with YouTube, Google, Hacker News or Y\n      Combinator. Video data comes from the YouTube Data API, and comments from the public Hacker News archive.</p>\n  </article>";
-else html='<h2>Page not found</h2><a href="#/">Return Home</a>';
-$('#view').innerHTML=html;if($('#playall'))$('#playall').href='https://www.youtube.com/watch_videos?video_ids='+v.slice(0,50).map(x=>x.id).join(',');bind()}
-function bind(){if($('#filters-toggle'))$('#filters-toggle').onclick=()=>{filtersOpen=!filtersOpen;render()};if($('#clear-history'))$('#clear-history').onclick=()=>{seen=[];write('seen',seen);render()};if($('#frames'))$('#frames').onchange=e=>{prefs.frames=e.target.checked;write('prefs',prefs)};if($('#appearance'))$('#appearance').onchange=e=>setTheme(e.target.value);if($('#load'))$('#load').onclick=()=>{limit+=72;render()};if($('#new-playlist'))$('#new-playlist').onsubmit=e=>{e.preventDefault();let title=new FormData(e.target).get('title').trim();if(!title)return;playlists.push({id:Date.now().toString(36),title,ids:[]});write('playlists',playlists);render()}}
-function setTheme(t){prefs.theme=t;document.documentElement.dataset.theme=t;write('prefs',prefs)}
-function choosePlaylist(id){const d=document.createElement('dialog');d.innerHTML='<h3>Add to playlist</h3>'+playlists.map(pl=>`<p><button class="pill" data-choose="${pl.id}">${esc(pl.title)}${pl.ids.includes(id)?' ✓':''}</button></p>`).join('')+'<form><input aria-label="New playlist name" placeholder="New playlist" required maxlength="100"><button class="pill">Create and add</button></form><p><button class="pill" data-close>Close</button></p>';document.body.append(d);d.showModal();d.onclick=e=>{let c=e.target.closest('[data-choose]');if(c){let pl=playlists.find(x=>x.id===c.dataset.choose);if(!pl.ids.includes(id))pl.ids.push(id);write('playlists',playlists);d.close();toast('Added to playlist')}if(e.target.closest('[data-close]'))d.close()};d.querySelector('form').onsubmit=e=>{e.preventDefault();let title=d.querySelector('input').value.trim();if(!title)return;playlists.push({id:Date.now().toString(36),title,ids:[id]});write('playlists',playlists);d.close();toast('Playlist created')};d.onclose=()=>d.remove()}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-save],[data-like],[data-watchsave],[data-filter],[data-delete],[data-addpl]');if(!b)return;e.preventDefault();e.stopPropagation();if(b.dataset.save){toggle('later',b.dataset.save);b.classList.toggle('active',later.includes(b.dataset.save));b.innerHTML=icon(later.includes(b.dataset.save)?'check':'later');b.setAttribute('aria-label',later.includes(b.dataset.save)?'Remove from Watch later':'Watch later');toast(later.includes(b.dataset.save)?'Saved to Watch later':'Removed from Watch later');if(current().pathname==='/later')render()}if(b.dataset.like){toggle('likes',b.dataset.like);b.classList.toggle('active',likes.includes(b.dataset.like));b.innerHTML=icon('liked')+(likes.includes(b.dataset.like)?'Liked':'Like')}if(b.dataset.watchsave){toggle('later',b.dataset.watchsave);b.innerHTML=icon('later')+(later.includes(b.dataset.watchsave)?'Saved':'Watch later')}if(b.hasAttribute('data-filter')){let u=current(),k=b.dataset.filter,v=b.dataset.value;if(u.searchParams.get(k)===v||!v)u.searchParams.delete(k);else u.searchParams.set(k,v);go(u.pathname+u.search)}if(b.dataset.delete){playlists=playlists.filter(pl=>pl.id!==b.dataset.delete);write('playlists',playlists);render()}if(b.dataset.addpl)choosePlaylist(b.dataset.addpl)});
-$('#menu').onclick=()=>document.body.classList.toggle(innerWidth<=800?'drawer':'collapsed');$('#scrim').onclick=()=>document.body.classList.remove('drawer');$('#theme').onclick=()=>setTheme(prefs.theme==='dark'?'light':'dark');$('#search').onsubmit=e=>{e.preventDefault();let q=$('#query').value.trim();go(q?'/search/'+encodeURIComponent(q):'/');$('#query').blur()};$('#close-help').onclick=()=>$('#help').close();document.addEventListener('keydown',e=>{if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName))return;if(e.key==='/'){e.preventDefault();$('#query').focus()}if(e.key==='?')$('#help').showModal();if(e.key==='Escape')document.body.classList.remove('drawer')});addEventListener('hashchange',()=>{limit=72;render();scrollTo(0,0)});render();
-})();
+// GuessTube · 看画面猜英文
+// 数据来自 data/videos.js（window.VIDEO_DATA），用户记录存在 localStorage
+'use strict';
+
+const DATA = window.VIDEO_DATA || { videos: [] };
+const videos = DATA.videos;
+const byId = Object.fromEntries(videos.map(v => [v.id, v]));
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// ---------- 本地存储 ----------
+const read = (k, d) => { try { return JSON.parse(localStorage.getItem('gt-' + k)) ?? d; } catch { return d; } };
+const write = (k, v) => { try { localStorage.setItem('gt-' + k, JSON.stringify(v)); } catch { toast('浏览器存储不可用，本次记录不会保存'); } };
+let history = read('history', []);      // [id]
+let later = read('later', []);          // [id]
+let results = read('results', {});      // id -> {score,total,at}
+let prefs = read('prefs', { theme: 'dark' });
+
+// ---------- 图标 ----------
+const P = {
+  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  home: '<path d="m3 11 9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+  scenes: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  history: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/>',
+  later: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  check: '<path d="m5 12 5 5 9-10"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
+  theme: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  replay: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+};
+const icon = n => `<svg viewBox="0 0 24 24" aria-hidden="true">${P[n] || ''}</svg>`;
+$('#menu').innerHTML = icon('menu');
+$('#search-button').innerHTML = icon('search');
+$('#theme').innerHTML = icon('theme');
+
+const NAV = [
+  ['/', '首页', 'home'],
+  ['/scenes', '场景', 'scenes'],
+  ['/history', '看过的', 'history'],
+  ['/later', '稍后看', 'later'],
+];
+
+// ---------- 工具 ----------
+const mmss = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const LEVEL = { 1: '入门', 2: '中等', 3: '较难' };
+const scenes = [...new Set(videos.map(v => v.scene))];
+
+function toast(s) {
+  const t = $('#toast');
+  t.textContent = s; t.classList.add('show');
+  clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function route() {
+  const h = location.hash.startsWith('#/') ? location.hash.slice(1) : '/';
+  return new URL(h, 'https://x.invalid');
+}
+
+function card(v) {
+  const r = results[v.id];
+  const badge = r ? `<span class="done">${r.score}/${r.total}</span>` : '';
+  const saved = later.includes(v.id);
+  return `<a class="card" href="#/watch/${v.id}">
+    <div class="thumb"><img src="https://i.ytimg.com/vi/${v.id}/mqdefault.jpg" alt="" loading="lazy">
+      <button class="save ${saved ? 'active' : ''}" data-save="${v.id}" aria-label="稍后看">${icon(saved ? 'check' : 'later')}</button>
+      ${badge}<span class="duration">${mmss(v.seconds)}</span></div>
+    <div class="info"><h3>${esc(v.title)}</h3>
+      <div class="sub">${esc(v.scene)} · ${LEVEL[v.level] || ''}</div></div></a>`;
+}
+
+const grid = list => list.length ? `<div class="grid">${list.map(card).join('')}</div>` : '<div class="status">这里还没有视频</div>';
+
+// ---------- 页面 ----------
+let player = null;
+
+function render() {
+  const u = route();
+  const path = u.pathname.replace(/\/$/, '') || '/';
+  const q = (u.searchParams.get('q') || '').toLowerCase();
+  player = null;
+  document.querySelectorAll('nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + path));
+  let html = '';
+
+  if (path === '/') {
+    const sc = u.searchParams.get('scene') || '';
+    const lv = u.searchParams.get('level') || '';
+    let list = videos.filter(v => (!sc || v.scene === sc) && (!lv || String(v.level) === lv));
+    if (q) list = list.filter(v => (v.title + v.scene + v.channel).toLowerCase().includes(q));
+    const chip = (k, val, label, cur) => `<a class="pill ${cur === val ? 'active' : ''}" href="#/?${new URLSearchParams({ ...(sc && k !== 'scene' ? { scene: sc } : {}), ...(lv && k !== 'level' ? { level: lv } : {}), ...(val ? { [k]: val } : {}) })}">${label}</a>`;
+    html = `<div class="toolbar">${chip('scene', '', '全部', sc)}${scenes.map(s => chip('scene', s, esc(s), sc)).join('')}</div>
+      <div class="toolbar">${chip('level', '', '全部难度', lv)}${[1, 2, 3].map(l => chip('level', String(l), LEVEL[l], lv)).join('')}
+      <span class="grow"></span><span class="sub">${list.length} 个视频 · 已做 ${Object.keys(results).length}</span></div>
+      ${q ? `<h2>搜索 “${esc(q)}”</h2>` : ''}${grid(list)}`;
+  } else if (path === '/scenes') {
+    html = `<h2>场景</h2><div class="areas">${scenes.map(s => {
+      const list = videos.filter(v => v.scene === s);
+      const done = list.filter(v => results[v.id]).length;
+      return `<a class="area" href="#/?scene=${encodeURIComponent(s)}"><h3>${esc(s)}</h3><span class="sub">${list.length} 个 · 做过 ${done}</span></a>`;
+    }).join('')}</div>`;
+  } else if (path === '/history') {
+    html = `<h2>看过的</h2>${history.length ? `<div class="toolbar"><button class="pill" id="clear-history">清空记录</button></div>` : ''}${grid(history.slice().reverse().map(id => byId[id]).filter(Boolean))}`;
+  } else if (path === '/later') {
+    html = `<h2>稍后看</h2>${grid(later.slice().reverse().map(id => byId[id]).filter(Boolean))}`;
+  } else if (path.startsWith('/watch/')) {
+    const v = byId[path.slice(7)];
+    if (!v) { html = '<div class="status">找不到这个视频</div>'; }
+    else {
+      if (history.at(-1) !== v.id) { history = history.filter(x => x !== v.id).concat(v.id).slice(-300); write('history', history); }
+      const start = +u.searchParams.get('t') || 0;
+      html = `<div class="watch"><section class="primary">
+        <div class="player"><div id="yt"></div></div>
+        <h1>${esc(v.title)}</h1>
+        <div class="owner"><span class="sub">${esc(v.scene)} · ${LEVEL[v.level] || ''} · ${mmss(v.seconds)} · ${esc(v.channel)}</span>
+          <div class="actions"><button class="pill" id="replay">${icon('replay')}从头再看</button>
+          <button class="pill" data-watchsave="${v.id}">${icon('later')}${later.includes(v.id) ? '已加入' : '稍后看'}</button></div></div>
+        <div id="quiz" class="quiz"><div class="waiting"><b>先别看字幕，完整看完这一段</b>
+          <p>看完会自动出题。画面里发生了什么、他们大概在说什么，先在心里猜一猜。</p>
+          <button class="pill" id="start-quiz">我看完了，开始答题</button></div></div>
+      </section><aside class="related">${videos.filter(x => x.id !== v.id && x.scene === v.scene).concat(videos.filter(x => x.scene !== v.scene)).slice(0, 10).map(card).join('')}</aside></div>`;
+      $('#view').innerHTML = html;
+      bind();
+      mountPlayer(v, start);
+      $('#start-quiz').onclick = () => showQuiz(v);
+      $('#replay').onclick = () => { player?.seekTo?.(0, true); player?.playVideo?.(); };
+      window.scrollTo(0, 0);
+      return;
+    }
+  } else {
+    html = '<div class="status">页面不存在</div>';
+  }
+  $('#view').innerHTML = html;
+  bind();
+}
+
+// ---------- 播放器（YouTube IFrame API） ----------
+let ytReady = null;
+function loadYT() {
+  if (ytReady) return ytReady;
+  ytReady = new Promise(res => {
+    window.onYouTubeIframeAPIReady = res;
+    const s = document.createElement('script');
+    s.src = 'https://www.youtube.com/iframe_api';
+    s.onerror = () => toast('播放器加载失败，检查一下代理');
+    document.head.appendChild(s);
+  });
+  return ytReady;
+}
+
+function mountPlayer(v, start) {
+  loadYT().then(() => {
+    if (!$('#yt')) return;
+    player = new YT.Player('yt', {
+      videoId: v.id,
+      playerVars: { cc_load_policy: 0, iv_load_policy: 3, rel: 0, modestbranding: 1, playsinline: 1, start, hl: 'en' },
+      events: {
+        onReady: e => { try { e.target.unloadModule('captions'); e.target.unloadModule('cc'); } catch {} },
+        onStateChange: e => {
+          if (e.data === 1) { try { e.target.unloadModule('captions'); } catch {} }   // 播放时再关一次字幕
+          if (e.data === 0 && !$('#quiz .q')) showQuiz(v);                          // 播完自动出题
+        },
+        onError: e => toast(`这个视频暂时放不了（错误 ${e.data}），可以先跳过`),
+      },
+    });
+  });
+}
+
+const seek = t => { if (player?.seekTo) { player.seekTo(Math.max(0, t - 0.5), true); player.playVideo(); window.scrollTo({ top: 0, behavior: 'smooth' }); } };
+
+// ---------- 答题 ----------
+function showQuiz(v) {
+  const box = $('#quiz');
+  if (!box) return;
+  box.innerHTML = `<h2>猜一猜</h2>${v.questions.map((q, i) => `
+    <div class="q" data-i="${i}"><div class="qhead"><b>${i + 1}. ${esc(q.q)}</b>
+      ${q.t != null ? `<button class="link" data-seek="${q.t}">▶ 重听 ${mmss(q.t)}</button>` : ''}</div>
+      ${q.options.map((o, j) => `<label class="opt"><input type="radio" name="q${i}" value="${j}"><span>${esc(o)}</span></label>`).join('')}
+      <div class="explain"></div></div>`).join('')}
+    <button class="pill primary-btn" id="submit">交卷，看答案</button>`;
+  bind();
+  $('#submit').onclick = () => grade(v);
+}
+
+function grade(v) {
+  let score = 0;
+  v.questions.forEach((q, i) => {
+    const el = document.querySelector(`.q[data-i="${i}"]`);
+    const picked = el.querySelector('input:checked');
+    const ok = picked && +picked.value === q.answer;
+    if (ok) score++;
+    el.classList.add(ok ? 'right' : 'wrong');
+    el.querySelectorAll('.opt').forEach((o, j) => { if (j === q.answer) o.classList.add('answer'); });
+    el.querySelectorAll('input').forEach(x => x.disabled = true);
+    el.querySelector('.explain').innerHTML = (ok ? '✓ ' : '✗ ') + esc(q.explain || '');
+  });
+  results[v.id] = { score, total: v.questions.length, at: Date.now() };
+  write('results', results);
+  $('#submit').remove();
+  $('#quiz').insertAdjacentHTML('beforeend', `
+    <div class="score">${score} / ${v.questions.length}</div>
+    ${v.summary ? `<p class="summary">${esc(v.summary)}</p>` : ''}
+    <h2>原文对照</h2><p class="notice">点任意一句，跳到那一刻重听。</p>
+    <div class="transcript">${v.lines.map(l => `<button class="line" data-seek="${l.t}"><span class="ts">${mmss(l.t)}</span><span><b>${esc(l.en)}</b><i>${esc(l.zh)}</i></span></button>`).join('')}</div>`);
+  bind();
+  $('#quiz').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ---------- 事件 ----------
+function bind() {
+  document.querySelectorAll('[data-save]').forEach(b => b.onclick = e => {
+    e.preventDefault(); e.stopPropagation();
+    const id = b.dataset.save;
+    later = later.includes(id) ? later.filter(x => x !== id) : later.concat(id);
+    write('later', later); toast(later.includes(id) ? '已加入稍后看' : '已移出稍后看'); render();
+  });
+  document.querySelectorAll('[data-watchsave]').forEach(b => b.onclick = () => {
+    const id = b.dataset.watchsave;
+    later = later.includes(id) ? later.filter(x => x !== id) : later.concat(id);
+    write('later', later); b.innerHTML = icon('later') + (later.includes(id) ? '已加入' : '稍后看');
+  });
+  document.querySelectorAll('[data-seek]').forEach(b => b.onclick = () => seek(+b.dataset.seek));
+  const ch = $('#clear-history');
+  if (ch) ch.onclick = () => { history = []; write('history', history); render(); };
+}
+
+$('nav').innerHTML = NAV.map(([h, t, i]) => `<a href="#${h}">${icon(i)}<span>${t}</span></a>`).join('');
+$('#search').onsubmit = e => { e.preventDefault(); location.hash = '#/?q=' + encodeURIComponent($('#query').value.trim()); };
+$('#menu').onclick = () => document.body.classList.toggle(innerWidth <= 800 ? 'drawer' : 'collapsed');
+$('#scrim').onclick = () => document.body.classList.remove('drawer');
+function setTheme(t) { prefs.theme = t; write('prefs', prefs); document.documentElement.dataset.theme = t; }
+$('#theme').onclick = () => setTheme(prefs.theme === 'dark' ? 'light' : 'dark');
+setTheme(prefs.theme);
+addEventListener('hashchange', () => { document.body.classList.remove('drawer'); render(); });
+render();
