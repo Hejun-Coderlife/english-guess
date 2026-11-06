@@ -16,6 +16,8 @@ BAD = re.compile(r"song|sing|music|lyric|dance|montage|monologue|stand-?up|podca
                  r"behind the scenes|bloopers|cast |kill|murder|shoot|gun|dead|blood|tortur|fight|battle|war\b|"
                  r"full episode|episode \d+ full|compilation|best of|moments|trailer|teaser|first look|script to screen|#shorts", re.I)
 DROP_PICKS = {"HQloEkUc_fU"}  # 实际是混剪预告，不是完整场景
+# 人工看标题排除：暴力/成人、纯谈话、配乐盖对白、对白太密
+EXCLUDE = set("XRKPQf-TIG8 ZY0DG8rUnCA QZgYrbeFlec S7_-vub6_ug QNBa3HHjnGA dHasWstp6Tk BZcvzXinenE qLOeBL8ii_Y du1t9OyaI-8 lzWJiZP7j6o txjvoZ5me2g 7Xe2yhUJfHY".split())
 SCENE_FIX = {"X8PsYhkLDhU": "办公室"}  # 实际是警局晨会
 
 short = {r["id"]: r for r in json.loads((R / "work/shortlist.json").read_text())}
@@ -44,7 +46,7 @@ for vid, scene, *_ in PICKS:
     chosen.append({**r, "scene": SCENE_FIX.get(vid, scene), "picked": True})
     seen.add(key(r["title"])); per[r["channel"]] += 1
 
-pool = [r for r in short.values() if r["id"] not in {c["id"] for c in chosen} and ok(r)]
+pool = [r for r in short.values() if r["id"] not in {c["id"] for c in chosen} and r["id"] not in EXCLUDE and ok(r)]
 # 先近年的、播放量高的
 pool.sort(key=lambda r: (r["published"] < "2020", -r["views"]))
 for r in pool:
